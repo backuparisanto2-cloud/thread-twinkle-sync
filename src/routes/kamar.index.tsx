@@ -14,6 +14,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { allRoomItemsQuery, roomsQuery } from "@/lib/inventory";
+import { downloadSimplePdf } from "@/lib/pdf-report";
+
 
 type Search = { lantai: number };
 
