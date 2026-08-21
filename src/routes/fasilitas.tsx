@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { FileDown, Plus, Pencil, Trash2, Search } from "lucide-react";
 import { toast } from "sonner";
 
 
@@ -34,6 +34,8 @@ import {
   sharedItemsQuery,
   updateSharedItem,
 } from "@/lib/inventory";
+import { downloadSimplePdf } from "@/lib/pdf-report";
+
 import { formInitial, itemPayload } from "@/lib/item-payload";
 
 
@@ -163,7 +165,40 @@ function SharedFacilities() {
               aria-label="Cari fasilitas"
             />
           </div>
+          <Button
+            variant="outline"
+            className="h-11 w-full sm:w-auto"
+            onClick={() =>
+              downloadSimplePdf(
+                {
+                  title: "Ringkasan Fasilitas Utama",
+                  subtitle: "Fasilitas bersama Lavin Kost Purwokerto.",
+                  summary: [
+                    { label: "Jenis fasilitas", value: String(list.length) },
+                    {
+                      label: "Total unit",
+                      value: String(list.reduce((sum, i) => sum + i.quantity, 0)),
+                    },
+                  ],
+                  head: ["Nama", "Kategori", "Lokasi", "Jumlah", "Kondisi", "Catatan"],
+                  body: list.map((i) => [
+                    i.name,
+                    i.category,
+                    i.location ?? "—",
+                    i.quantity,
+                    i.condition,
+                    i.notes ?? "—",
+                  ]),
+                  numericColumns: [3],
+                },
+                "ringkasan-fasilitas.pdf",
+              )
+            }
+          >
+            <FileDown className="mr-2 h-4 w-4" /> Ekspor PDF
+          </Button>
           <ItemFormDialog
+
             trigger={
               <Button className="h-11 w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" /> Tambah fasilitas

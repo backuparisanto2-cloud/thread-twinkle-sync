@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pencil, Plus, Search, Trash2, UserPlus } from "lucide-react";
+import { FileDown, Pencil, Plus, Search, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -38,6 +38,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatRupiah, formatTanggal } from "@/lib/expenses";
+import { downloadSimplePdf } from "@/lib/pdf-report";
 import {
   PAYMENT_METHODS,
   PERIOD_TYPES,
@@ -198,7 +199,47 @@ function IncomePage() {
       title="Pendapatan"
       subtitle="Pembayaran kos penghuni: periode, cara pembayaran, dan bukti transfer."
     >
+      <div className="mb-3 flex justify-end">
+        <Button
+          variant="outline"
+          onClick={() =>
+            downloadSimplePdf(
+              {
+                title: "Laporan Pendapatan",
+                subtitle: "Pembayaran kos dan pemasukan lain-lain Lavin Kost Purwokerto.",
+                summary: [
+                  { label: "Total", value: formatRupiah(total) },
+                  { label: "Kos", value: formatRupiah(totalKos) },
+                  { label: "Lain-lain", value: formatRupiah(totalLain) },
+                ],
+                head: ["Tanggal", "Sumber", "Keterangan", "Metode", "Nominal"],
+                body: [
+                  ...filtered.map((i) => [
+                    formatTanggal(i.payment_date),
+                    `Kos · ${i.tenant_name}`,
+                    `Kamar ${i.room_number ?? "—"} · ${i.period_type}`,
+                    i.payment_method,
+                    formatRupiah(i.amount || 0),
+                  ]),
+                  ...filteredOthers.map((o) => [
+                    formatTanggal(o.income_date),
+                    `Lain-lain · ${o.name}`,
+                    o.payer ?? o.description ?? "—",
+                    o.payment_method,
+                    formatRupiah(o.amount || 0),
+                  ]),
+                ],
+                numericColumns: [4],
+              },
+              "laporan-pendapatan.pdf",
+            )
+          }
+        >
+          <FileDown className="mr-2 h-4 w-4" /> Ekspor PDF
+        </Button>
+      </div>
       <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
         <div className="rounded-lg border border-gold-line bg-card p-4">
           <p className="text-[11px] tracking-[0.16em] text-muted-foreground uppercase">
             Total tampil

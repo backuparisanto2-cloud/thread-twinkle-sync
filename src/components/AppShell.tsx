@@ -8,6 +8,8 @@ import {
   Coins,
   Map,
   Users,
+  Settings,
+
 
   Menu,
   Type,
@@ -33,10 +35,12 @@ const nav = [
   { to: "/tenant", label: "Tenant & Pembayaran", icon: Users },
   { to: "/pendapatan", label: "Pendapatan", icon: Coins },
   { to: "/pengeluaran", label: "Pengeluaran", icon: Wallet },
+  { to: "/kelola", label: "Kelola Data", icon: Settings },
   { to: "/laporan", label: "Laporan", icon: FileBarChart },
 
 
 ] as const;
+
 
 function TextSizeControl({ compact = false }: { compact?: boolean }) {
   const { size, setSize } = useTextSize();

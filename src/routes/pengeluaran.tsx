@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { FileDown, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -42,6 +42,8 @@ import {
   formatTanggal,
   updateExpense,
 } from "@/lib/expenses";
+import { downloadSimplePdf } from "@/lib/pdf-report";
+
 
 export const Route = createFileRoute("/pengeluaran")({
   head: () => ({
@@ -133,7 +135,38 @@ function ExpensesPage() {
       title="Pengeluaran"
       subtitle="Belanja, service, jasa, iuran, dan pengeluaran lainnya."
     >
+      <div className="mb-3 flex justify-end">
+        <Button
+          variant="outline"
+          onClick={() =>
+            downloadSimplePdf(
+              {
+                title: "Laporan Pengeluaran",
+                subtitle: "Belanja, service, jasa, dan iuran Lavin Kost Purwokerto.",
+                summary: [
+                  { label: "Total", value: formatRupiah(total) },
+                  { label: "Transaksi", value: String(filtered.length) },
+                ],
+                head: ["Tanggal", "Kategori", "Nama", "Lokasi/Vendor", "Nota", "Nominal"],
+                body: filtered.map((e) => [
+                  formatTanggal(e.expense_date),
+                  e.category,
+                  e.name,
+                  e.location ?? e.vendor ?? "—",
+                  e.invoice_no ?? "—",
+                  formatRupiah(e.amount || 0),
+                ]),
+                numericColumns: [5],
+              },
+              "laporan-pengeluaran.pdf",
+            )
+          }
+        >
+          <FileDown className="mr-2 h-4 w-4" /> Ekspor PDF
+        </Button>
+      </div>
       <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+
         <div className="rounded-lg border border-gold-line bg-card p-4">
           <p className="text-[11px] tracking-[0.16em] text-muted-foreground uppercase">
             Total tampil

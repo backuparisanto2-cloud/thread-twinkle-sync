@@ -36,47 +36,52 @@ export function SplashScreen() {
       role="status"
       aria-label="Memuat aplikasi inventaris Lavin Kost Purwokerto"
       onClick={() => setLeaving(true)}
-      className={`fixed inset-0 z-[100] flex flex-col bg-background transition-opacity duration-700 ${
+      className={`fixed inset-0 z-[100] overflow-hidden bg-[#0b0d10] transition-opacity duration-700 ${
         leaving ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >
-      <div className="relative flex-1 overflow-hidden">
-        <img
-          src={splashAsset.url}
-          srcSet={splashSrcSet}
-          sizes="(min-width: 1024px) 60vw, 100vw"
-          width={1024}
-          height={1024}
-          fetchPriority="high"
-          decoding="async"
-          alt="Bangunan Lavin Kost Purwokerto"
-          className="h-full w-full object-cover object-center sm:object-[center_35%]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/25 to-transparent" />
-      </div>
+      <img
+        src={splashAsset.url}
+        srcSet={splashSrcSet}
+        sizes="100vw"
+        width={1024}
+        height={1084}
+        fetchPriority="high"
+        decoding="async"
+        alt="Bangunan Lavin Kost Purwokerto"
+        className="absolute inset-0 h-full w-full animate-[splash-zoom_6s_ease-out_forwards] object-cover object-center"
+      />
 
-      <div className="relative -mt-20 px-6 pb-10 text-center sm:-mt-24 sm:px-8 sm:pb-14 lg:-mt-32 lg:pb-20">
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0b0d10] via-[#0b0d10]/55 to-[#0b0d10]/15" />
+      <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_10%,transparent_35%,rgba(11,13,16,0.75)_100%)]" />
+
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center px-8 pb-14 text-center sm:pb-20">
         <img
           src="/app-icon-192.png"
           alt=""
           width={56}
           height={56}
-          className="mx-auto h-12 w-12 rounded-md border border-gold-line bg-card shadow-sm sm:h-14 sm:w-14 lg:h-16 lg:w-16"
+          className="h-12 w-12 rounded-full border border-[#d4b877]/60 bg-black/30 p-1 shadow-lg backdrop-blur sm:h-14 sm:w-14"
         />
-        <p className="mt-4 text-[10px] tracking-[0.3em] text-muted-foreground uppercase sm:mt-5 sm:text-[11px] sm:tracking-[0.34em]">
-          Sistem Inventaris
+        <p className="mt-5 text-[10px] tracking-[0.42em] text-[#d4b877] uppercase sm:text-[11px]">
+          Eksklusif
         </p>
-        <h1 className="mt-2 font-display text-xl leading-snug font-semibold tracking-tight text-balance text-foreground sm:text-2xl lg:text-4xl">
+        <h1 className="mt-3 font-display text-[1.7rem] leading-tight font-light tracking-[0.06em] text-white text-balance sm:text-4xl lg:text-5xl">
           Lavin Kost Purwokerto
         </h1>
-        <div className="mx-auto mt-4 h-px w-12 bg-primary sm:w-16 lg:w-24" />
-        <p className="mt-3 text-[11px] text-muted-foreground sm:mt-4 sm:text-xs lg:text-sm">
-          Pencatatan fasilitas kamar &amp; fasilitas utama
+        <div className="mt-5 flex items-center gap-3">
+          <span className="h-px w-10 bg-gradient-to-r from-transparent to-[#d4b877] sm:w-16" />
+          <span className="h-1.5 w-1.5 rotate-45 bg-[#d4b877]" />
+          <span className="h-px w-10 bg-gradient-to-l from-transparent to-[#d4b877] sm:w-16" />
+        </div>
+        <p className="mt-5 text-[11px] tracking-[0.22em] text-white/70 uppercase sm:text-xs">
+          Sistem Inventaris &amp; Manajemen Hunian
         </p>
-        <div className="mx-auto mt-6 h-0.5 w-32 overflow-hidden rounded-full bg-accent sm:mt-8 sm:w-40 lg:w-56">
-          <div className="h-full w-1/3 animate-[splash-bar_1.6s_ease-in-out_infinite] bg-primary" />
+        <div className="mt-8 h-0.5 w-32 overflow-hidden rounded-full bg-white/15 sm:w-44">
+          <div className="h-full w-1/3 animate-[splash-bar_1.6s_ease-in-out_infinite] bg-[#d4b877]" />
         </div>
       </div>
     </div>
   );
 }
+

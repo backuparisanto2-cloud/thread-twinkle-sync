@@ -79,8 +79,17 @@ export type TenantStatusLog = {
   id: string;
   old_status: string | null;
   new_status: string;
+  old_room: string | null;
+  new_room: string | null;
+  note: string | null;
   changed_at: string;
 };
+
+export type TenantHistoryEntry = TenantStatusLog & {
+  tenant_id: string | null;
+  tenant_name: string | null;
+};
+
 
 export type TenantProfile = {
   id: string;
@@ -145,8 +154,22 @@ const SELECT = `
   tenant_emergency_contacts ( id, name, relationship, phone, notes ),
   tenant_vehicles ( id, vehicle_type, brand_model, plate_number ),
   tenant_payments ( id, tenant_id, payment_date, period_type, period_start, period_end, amount, payment_method, notes, attachments ),
-  tenant_status_history ( id, old_status, new_status, changed_at )
+  tenant_status_history ( id, old_status, new_status, old_room, new_room, note, changed_at )
 `;
+
+export const tenantHistoryQuery = {
+  queryKey: ["tenant_history"] as const,
+  queryFn: async (): Promise<TenantHistoryEntry[]> => {
+    const { data, error } = await db
+      .from("tenant_status_history")
+      .select("id, tenant_id, tenant_name, old_status, new_status, old_room, new_room, note, changed_at")
+      .order("changed_at", { ascending: false })
+      .limit(300);
+    if (error) throw new Error(error.message);
+    return (data ?? []) as unknown as TenantHistoryEntry[];
+  },
+};
+
 
 export const tenantProfilesQuery = {
   queryKey: ["tenant_profiles"] as const,

@@ -172,6 +172,14 @@
   100% { transform: translateX(320%); }
 }
 
+@keyframes splash-zoom {
+  0% { transform: scale(1.12); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+
+
 @utility gold-rule {
   border-bottom: 1px solid var(--gold-line);
 }

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { AlertTriangle, Pencil, Search, Trash2, UserPlus } from "lucide-react";
+import { AlertTriangle, FileDown, History, Pencil, Search, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -18,8 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatRupiah, formatTanggal } from "@/lib/expenses";
 import { roomsQuery } from "@/lib/inventory";
+import { downloadSimplePdf } from "@/lib/pdf-report";
 import {
   TENANT_STATUSES,
   addTenantPayment,
@@ -27,6 +29,7 @@ import {
   deleteTenantProfile,
   dueInfo,
   saveTenantProfile,
+  tenantHistoryQuery,
   tenantProfilesQuery,
   totalPaid,
   type EmergencyContact,
@@ -36,6 +39,7 @@ import {
   type TenantProfilePayload,
   type TenantVehicle,
 } from "@/lib/tenants";
+
 
 export const Route = createFileRoute("/tenant")({
   head: () => ({
@@ -174,7 +178,17 @@ function TenantPage() {
           </div>
         </div>
 
+        <Tabs defaultValue="daftar">
+        <TabsList>
+          <TabsTrigger value="daftar">Daftar tenant</TabsTrigger>
+          <TabsTrigger value="riwayat" className="gap-1">
+            <History className="h-4 w-4" /> Riwayat perubahan
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="daftar" className="space-y-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+
           <div className="relative flex-1">
             <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -205,6 +219,37 @@ function TenantPage() {
           >
             <UserPlus className="mr-1 h-4 w-4" /> Tambah tenant
           </Button>
+          <Button
+            variant="outline"
+            onClick={() =>
+              downloadSimplePdf(
+                {
+                  title: "Laporan Tenant & Pembayaran",
+                  subtitle: "Data penghuni Lavin Kost Purwokerto",
+                  summary: [
+                    { label: "Tenant aktif", value: String(activeCount) },
+                    { label: "Total tenant", value: String(list.length) },
+                    { label: "Lewat jatuh tempo", value: String(lateCount) },
+                  ],
+                  head: ["Nama", "Kamar", "Status", "Kontak", "Masuk", "Jatuh tempo", "Total bayar"],
+                  body: filtered.map((t) => [
+                    t.name,
+                    t.room_number ?? "—",
+                    t.status,
+                    t.contact ?? t.phones[0]?.phone ?? "—",
+                    t.check_in_date ? formatTanggal(t.check_in_date) : "—",
+                    t.due_date ? formatTanggal(t.due_date) : "—",
+                    formatRupiah(totalPaid(t)),
+                  ]),
+                  numericColumns: [6],
+                },
+                "laporan-tenant.pdf",
+              )
+            }
+          >
+            <FileDown className="mr-1 h-4 w-4" /> PDF
+          </Button>
+
         </div>
 
         {tenants.isLoading ? <p className="text-sm text-muted-foreground">Memuat data…</p> : null}
@@ -291,7 +336,14 @@ function TenantPage() {
             );
           })}
         </ul>
+        </TabsContent>
+
+        <TabsContent value="riwayat" className="space-y-4">
+          <TenantHistoryTab />
+        </TabsContent>
+        </Tabs>
       </div>
+
 
       <TenantFullFormDialog
         open={formOpen}
@@ -327,5 +379,70 @@ function TenantPage() {
         onDeletePayment={(id) => deletePaymentMutation.mutate(id)}
       />
     </AppShell>
+  );
+}
+
+function TenantHistoryTab() {
+  const history = useQuery(tenantHistoryQuery);
+  const rows = history.data ?? [];
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm text-muted-foreground">
+          {rows.length} catatan perubahan status dan perpindahan kamar.
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={rows.length === 0}
+          onClick={() =>
+            downloadSimplePdf(
+              {
+                title: "Riwayat Perubahan Data Tenant",
+                head: ["Waktu", "Tenant", "Status", "Kamar", "Catatan"],
+                body: rows.map((r) => [
+                  new Date(r.changed_at).toLocaleString("id-ID"),
+                  r.tenant_name ?? "—",
+                  `${r.old_status ?? "—"} → ${r.new_status}`,
+                  `${r.old_room ?? "—"} → ${r.new_room ?? "—"}`,
+                  r.note ?? "—",
+                ]),
+              },
+              "riwayat-tenant.pdf",
+            )
+          }
+        >
+          <FileDown className="mr-1 h-4 w-4" /> PDF
+        </Button>
+      </div>
+
+      {history.isLoading ? <p className="text-sm text-muted-foreground">Memuat riwayat…</p> : null}
+      {history.isError ? (
+        <p className="text-sm text-destructive">{(history.error as Error).message}</p>
+      ) : null}
+
+      <ol className="space-y-2">
+        {rows.map((row) => (
+          <li key={row.id} className="rounded-lg border p-3 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="font-medium">{row.tenant_name ?? "Tenant"}</p>
+              <p className="text-xs text-muted-foreground">
+                {new Date(row.changed_at).toLocaleString("id-ID")}
+              </p>
+            </div>
+            <p className="mt-1 text-muted-foreground">
+              Status: {row.old_status ?? "—"} → <span className="text-foreground">{row.new_status}</span>
+              {" · "}Kamar: {row.old_room ?? "—"} → <span className="text-foreground">{row.new_room ?? "—"}</span>
+            </p>
+            {row.note ? <p className="mt-1 text-xs text-muted-foreground">{row.note}</p> : null}
+          </li>
+        ))}
+      </ol>
+
+      {!history.isLoading && rows.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Belum ada riwayat perubahan.</p>
+      ) : null}
+    </div>
   );
 }
