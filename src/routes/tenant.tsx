@@ -219,6 +219,37 @@ function TenantPage() {
           >
             <UserPlus className="mr-1 h-4 w-4" /> Tambah tenant
           </Button>
+          <Button
+            variant="outline"
+            onClick={() =>
+              downloadSimplePdf(
+                {
+                  title: "Laporan Tenant & Pembayaran",
+                  subtitle: "Data penghuni Lavin Kost Purwokerto",
+                  summary: [
+                    { label: "Tenant aktif", value: String(activeCount) },
+                    { label: "Total tenant", value: String(list.length) },
+                    { label: "Lewat jatuh tempo", value: String(lateCount) },
+                  ],
+                  head: ["Nama", "Kamar", "Status", "Kontak", "Masuk", "Jatuh tempo", "Total bayar"],
+                  body: filtered.map((t) => [
+                    t.name,
+                    t.room_number ?? "—",
+                    t.status,
+                    t.contact ?? t.phones[0]?.phone ?? "—",
+                    t.check_in_date ? formatTanggal(t.check_in_date) : "—",
+                    t.due_date ? formatTanggal(t.due_date) : "—",
+                    formatRupiah(totalPaid(t)),
+                  ]),
+                  numericColumns: [6],
+                },
+                "laporan-tenant.pdf",
+              )
+            }
+          >
+            <FileDown className="mr-1 h-4 w-4" /> PDF
+          </Button>
+
         </div>
 
         {tenants.isLoading ? <p className="text-sm text-muted-foreground">Memuat data…</p> : null}
