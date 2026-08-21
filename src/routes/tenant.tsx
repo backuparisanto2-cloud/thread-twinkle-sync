@@ -381,3 +381,68 @@ function TenantPage() {
     </AppShell>
   );
 }
+
+function TenantHistoryTab() {
+  const history = useQuery(tenantHistoryQuery);
+  const rows = history.data ?? [];
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm text-muted-foreground">
+          {rows.length} catatan perubahan status dan perpindahan kamar.
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={rows.length === 0}
+          onClick={() =>
+            downloadSimplePdf(
+              {
+                title: "Riwayat Perubahan Data Tenant",
+                head: ["Waktu", "Tenant", "Status", "Kamar", "Catatan"],
+                body: rows.map((r) => [
+                  new Date(r.changed_at).toLocaleString("id-ID"),
+                  r.tenant_name ?? "—",
+                  `${r.old_status ?? "—"} → ${r.new_status}`,
+                  `${r.old_room ?? "—"} → ${r.new_room ?? "—"}`,
+                  r.note ?? "—",
+                ]),
+              },
+              "riwayat-tenant.pdf",
+            )
+          }
+        >
+          <FileDown className="mr-1 h-4 w-4" /> PDF
+        </Button>
+      </div>
+
+      {history.isLoading ? <p className="text-sm text-muted-foreground">Memuat riwayat…</p> : null}
+      {history.isError ? (
+        <p className="text-sm text-destructive">{(history.error as Error).message}</p>
+      ) : null}
+
+      <ol className="space-y-2">
+        {rows.map((row) => (
+          <li key={row.id} className="rounded-lg border p-3 text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="font-medium">{row.tenant_name ?? "Tenant"}</p>
+              <p className="text-xs text-muted-foreground">
+                {new Date(row.changed_at).toLocaleString("id-ID")}
+              </p>
+            </div>
+            <p className="mt-1 text-muted-foreground">
+              Status: {row.old_status ?? "—"} → <span className="text-foreground">{row.new_status}</span>
+              {" · "}Kamar: {row.old_room ?? "—"} → <span className="text-foreground">{row.new_room ?? "—"}</span>
+            </p>
+            {row.note ? <p className="mt-1 text-xs text-muted-foreground">{row.note}</p> : null}
+          </li>
+        ))}
+      </ol>
+
+      {!history.isLoading && rows.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Belum ada riwayat perubahan.</p>
+      ) : null}
+    </div>
+  );
+}
