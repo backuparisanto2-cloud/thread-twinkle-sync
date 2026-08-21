@@ -45,8 +45,8 @@ export function SplashScreen() {
           src={splashAsset.url}
           srcSet={splashSrcSet}
           sizes="(min-width: 1024px) 60vw, 100vw"
-          width={595}
-          height={630}
+          width={1024}
+          height={1024}
           fetchPriority="high"
           decoding="async"
           alt="Bangunan Lavin Kost Purwokerto"
