@@ -142,16 +142,55 @@ function RoomsPage() {
 
   return (
     <AppShell title="Kamar" subtitle="Cari kamar atau barang, lalu ubah inventarisnya.">
-      <div className="relative">
-        <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          placeholder="Cari nomor kamar atau nama barang..."
-          className="h-11 pl-9"
-          aria-label="Cari kamar atau barang"
-        />
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="Cari nomor kamar atau nama barang..."
+            className="h-11 pl-9"
+            aria-label="Cari kamar atau barang"
+          />
+        </div>
+        <Button
+          variant="outline"
+          className="h-11"
+          onClick={() =>
+            downloadSimplePdf(
+              {
+                title: "Ringkasan Kamar",
+                subtitle: "Daftar kamar Lavin Kost Purwokerto beserta jumlah unit barang.",
+                summary: [
+                  { label: "Jumlah kamar", value: String(list.length) },
+                  {
+                    label: "Total unit",
+                    value: String(
+                      list.reduce((sum, r) => sum + (perRoom.get(r.id)?.total ?? 0), 0),
+                    ),
+                  },
+                ],
+                head: ["Kamar", "Lantai", "Jenis barang", "Total unit", "Perlu perhatian"],
+                body: list.map((room) => {
+                  const stat = perRoom.get(room.id);
+                  return [
+                    room.number,
+                    room.floor === 0 ? "Rooftop" : `Lantai ${room.floor}`,
+                    stat?.jenis ?? 0,
+                    stat?.total ?? 0,
+                    stat?.masalah ?? 0,
+                  ];
+                }),
+                numericColumns: [2, 3, 4],
+              },
+              "ringkasan-kamar.pdf",
+            )
+          }
+        >
+          <FileDown className="mr-2 h-4 w-4" /> Ekspor PDF
+        </Button>
       </div>
+
 
       <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
         {[0, 1, 2, 3].map((floor) => (
