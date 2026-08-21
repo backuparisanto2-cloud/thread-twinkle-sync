@@ -178,7 +178,17 @@ function TenantPage() {
           </div>
         </div>
 
+        <Tabs defaultValue="daftar">
+        <TabsList>
+          <TabsTrigger value="daftar">Daftar tenant</TabsTrigger>
+          <TabsTrigger value="riwayat" className="gap-1">
+            <History className="h-4 w-4" /> Riwayat perubahan
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="daftar" className="space-y-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+
           <div className="relative flex-1">
             <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
