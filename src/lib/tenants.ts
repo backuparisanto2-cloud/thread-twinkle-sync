@@ -79,8 +79,17 @@ export type TenantStatusLog = {
   id: string;
   old_status: string | null;
   new_status: string;
+  old_room: string | null;
+  new_room: string | null;
+  note: string | null;
   changed_at: string;
 };
+
+export type TenantHistoryEntry = TenantStatusLog & {
+  tenant_id: string | null;
+  tenant_name: string | null;
+};
+
 
 export type TenantProfile = {
   id: string;
