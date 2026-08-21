@@ -8,6 +8,8 @@ import {
   Coins,
   Map,
   Users,
+  Settings,
+
 
   Menu,
   Type,
