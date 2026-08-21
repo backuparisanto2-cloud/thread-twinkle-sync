@@ -295,7 +295,14 @@ function TenantPage() {
             );
           })}
         </ul>
+        </TabsContent>
+
+        <TabsContent value="riwayat" className="space-y-4">
+          <TenantHistoryTab />
+        </TabsContent>
+        </Tabs>
       </div>
+
 
       <TenantFullFormDialog
         open={formOpen}
