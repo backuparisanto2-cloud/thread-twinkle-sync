@@ -34,6 +34,8 @@ import {
   sharedItemsQuery,
   updateSharedItem,
 } from "@/lib/inventory";
+import { downloadSimplePdf } from "@/lib/pdf-report";
+
 import { formInitial, itemPayload } from "@/lib/item-payload";
 
 
