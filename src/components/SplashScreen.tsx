@@ -5,9 +5,9 @@ import splash360 from "@/assets/splash-building-360.webp.asset.json";
 import splash480 from "@/assets/splash-building-480.webp.asset.json";
 
 const splashSrcSet = [
-  `${splash360.url} 360w`,
-  `${splash480.url} 480w`,
-  `${splashAsset.url} 595w`,
+  `${splash360.url} 512w`,
+  `${splash480.url} 512w`,
+  `${splashAsset.url} 1024w`,
 ].join(", ");
 
 const STORAGE_KEY = "lavin-splash-shown";
