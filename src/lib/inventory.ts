@@ -197,6 +197,25 @@ async function codeForUpdate(
 
 /* ---- mutations ---- */
 
+export type RoomPayload = { number: string; floor: number; notes: string | null };
+
+export async function addRoom(input: RoomPayload) {
+  const { error } = await supabase.from("rooms").insert(input as never);
+  if (error) throw new Error(error.message);
+}
+
+export async function updateRoom(id: string, patch: Partial<RoomPayload>) {
+  const { error } = await supabase.from("rooms").update(patch as never).eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteRoom(id: string) {
+  const { error } = await supabase.from("rooms").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+
+
 export async function addRoomItem(input: ItemPayload & { room_id: string }) {
   const code = input.code ?? (await generateItemCode(input.name, input.purchase_date));
   const { error } = await supabase.from("room_items").insert({ ...input, code } as never);
