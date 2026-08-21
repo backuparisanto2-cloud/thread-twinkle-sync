@@ -42,6 +42,8 @@ import {
   formatTanggal,
   updateExpense,
 } from "@/lib/expenses";
+import { downloadSimplePdf } from "@/lib/pdf-report";
+
 
 export const Route = createFileRoute("/pengeluaran")({
   head: () => ({
