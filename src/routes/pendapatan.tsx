@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pencil, Plus, Search, Trash2, UserPlus } from "lucide-react";
+import { FileDown, Pencil, Plus, Search, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -38,6 +38,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatRupiah, formatTanggal } from "@/lib/expenses";
+import { downloadSimplePdf } from "@/lib/pdf-report";
 import {
   PAYMENT_METHODS,
   PERIOD_TYPES,
